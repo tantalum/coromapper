@@ -48,4 +48,16 @@ define grippybot position (
 		point[10] [1.10 0.65]
 		point[11] [1 0.65]
 	)
+
+	grippy_sonars()
+)
+
+define grippy_sonars ranger (
+	scount 2
+
+	spose[0] [0.75 0.325 0]
+	spose[1] [0.75 0.825 0]
+
+	sview [0.3 2.0 30]
+	ssize [0.01 0.05]
 )

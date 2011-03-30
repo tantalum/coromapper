@@ -1,11 +1,14 @@
 include "map.inc"
 include "grippybot.inc"
 
-size [15 15]
-
 window (
 	size [700.0 700.0]
 	scale 35
+)
+
+floorplan (
+	bitmap "images/floorplan.png"
+	size [17.0 17.0 1.0]
 )
 
 grippybot (
