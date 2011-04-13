@@ -1,0 +1,28 @@
+= Build Player =
+== Check player from svn: ==
+	svn co http://playerstage.svn.sourceforge.net/svnroot/playerstage/code/player/trunk/ player-svn
+
+=== Make a Build Space ===
+	cd player-svn
+	mkdir build/
+	cd build/
+
+=== Configure CMake ===
+Inside of the 'build' directory:
+	ccmake ../
+Press 'c' to generate the default configuration and then 'g' to generate the build files
+
+=== Build the Project ===
+Still within the build directory run 'make' and then if everything goes well 'make install'.
+
+= Build Stage =
+== Clone Stage ==
+	git clone git://github.com/rtv/Stage.git Stage-repo
+
+== Build and Configure Stage ==
+	cd Stage-repo
+	mkdir build
+	cd build
+	ccmake ../
+As above press 'c' to configure the build and 'g' to generate the build files. Finally run
+
