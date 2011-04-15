@@ -1,0 +1,104 @@
+== Getting the software packages ==
+To start grab the Corobot software package from:
+{{{http://support.coroware.com/downloads/CoroBotLinuxPlayer-4.1.0.zip}}}
+
+Extract the package to a safe location:
+{{{
+tantalum@3antar:player-corobot$ unzip ~/Downloads/CoroBotLinuxPlayer-4.1.0.zip 
+Archive:  /home/tantalum/Downloads/CoroBotLinuxPlayer-4.1.0.zip
+  inflating: CoroBot Player CD 4.1/CoroWare CoroBot EULA.rtf  
+  inflating: CoroBot Player CD 4.1/Linux User and Reference Guide.pdf  
+   creating: CoroBot Player CD 4.1/Player/
+   creating: CoroBot Player CD 4.1/Player/CoroBotPlugin/
+  inflating: CoroBot Player CD 4.1/Player/CoroBotPlugin/corobot.cfg  
+  inflating: CoroBot Player CD 4.1/Player/CoroBotPlugin/corobot_comms.cc  
+  inflating: CoroBot Player CD 4.1/Player/CoroBotPlugin/corobot_comms.h  
+  inflating: CoroBot Player CD 4.1/Player/CoroBotPlugin/corobot_driver.cc  
+  inflating: CoroBot Player CD 4.1/Player/CoroBotPlugin/corobot_ptz.cc  
+  inflating: CoroBot Player CD 4.1/Player/CoroBotPlugin/corobot_ptz.h  
+  inflating: CoroBot Player CD 4.1/Player/CoroBotPlugin/corobotLaser.cfg  
+  inflating: CoroBot Player CD 4.1/Player/CoroBotPlugin/Makefile  
+  inflating: CoroBot Player CD 4.1/Player/gearbox-9.11.tar.gz  
+   creating: CoroBot Player CD 4.1/Player/GUI/
+  inflating: CoroBot Player CD 4.1/Player/GUI/arm.cc  
+  inflating: CoroBot Player CD 4.1/Player/GUI/battery.cc  
+  inflating: CoroBot Player CD 4.1/Player/GUI/camera.cc  
+  inflating: CoroBot Player CD 4.1/Player/GUI/connect.cc  
+  inflating: CoroBot Player CD 4.1/Player/GUI/drive.cc  
+  inflating: CoroBot Player CD 4.1/Player/GUI/general.cc  
+  inflating: CoroBot Player CD 4.1/Player/GUI/gps.cc  
+  inflating: CoroBot Player CD 4.1/Player/GUI/joystick.cc  
+  inflating: CoroBot Player CD 4.1/Player/GUI/logo300.jpg  
+  inflating: CoroBot Player CD 4.1/Player/GUI/Makefile  
+  inflating: CoroBot Player CD 4.1/Player/GUI/ocu.cc  
+  inflating: CoroBot Player CD 4.1/Player/GUI/ocu.glade  
+  inflating: CoroBot Player CD 4.1/Player/GUI/ocu.h  
+  inflating: CoroBot Player CD 4.1/Player/GUI/player.cc  
+  inflating: CoroBot Player CD 4.1/Player/GUI/template.xml  
+  inflating: CoroBot Player CD 4.1/Player/Phidgetlinux_2.1.6.20090806.tar.gz  
+  inflating: CoroBot Player CD 4.1/Player/player3.0.1cw.tar.gz  
+  inflating: CoroBot Player CD 4.1/Player/README  
+  inflating: CoroBot Player CD 4.1/Stop final -2.pdf  
+}}}
+
+At this point it is probably good to open the 'Linux User and Reference Guide.pdf' and skim over section "8.5 BUILDING SOFTWARE". This is a derivative of whats included in that section.
+
+== Installing Phidgets ==
+Back from where ever you extracted the CoroBot software to, cd into the Player directory, extract the Phidgets software package, and cd into the Phidgets directory:
+{{{
+tantalum@3antar:player-corobot$ cd CoroBot\ Player\ CD\ 4.1/Player/
+tantalum@3antar:Player$ ls
+CoroBotPlugin        GUI                                 player3.0.1cw.tar.gz
+gearbox-9.11.tar.gz  Phidgetlinux_2.1.6.20090806.tar.gz  README
+tantalum@3antar:Player$ tar xfz Phidgetlinux_2.1.6.20090806.tar.gz 
+tantalum@3antar:Player$ cd Phidgetlinux/phidget21/
+}}}
+
+Next build the software with make. It's possible to run just make and Phidgets will be installed in '/usr' or you can override the 'PREFIX' variable to install Phidgets in a different location. For example:
+{{{
+tantalum@3antar:phidget21$ make PREFIX=$HOME
+... SNIP ...
+tantalum@3antar:phidget21$ sudo make PREFIX=$HOME install
+... SNIP ...
+}}}
+
+Since there we only simulating the robot we can skip installing the UDev rules for the moment. 
+
+== Install Gearbox == 
+Now we move on to installing gearbox. For configuring gearbox we are going to use 'cmake' to generate the appropriate makefiles to build the project. 
+
+First off extract the gearbox software and move into the gearbox directory:
+{{{
+tantalum@3antar:Player$ cd Phidgetlinux/phidget21/
+tantalum@3antar:phidget21$ cd ../..
+tantalum@3antar:Player$ tar xfz gearbox-9.11.tar.gz 
+tantalum@3antar:Player$ cd gearbox-9.11/
+tantalum@3antar:gearbox-9.11$ 
+}}}
+
+Now were going to make a new directory inside of gearbox to hold the build files and then use the 'ccmake' utility to configure the build:
+{{{
+tantalum@3antar:gearbox-9.11$ mkdir build
+tantalum@3antar:gearbox-9.11$ cd build/
+tantalum@3antar:build$ ccmake ../
+}}}
+
+One 'ccmake' is running press "c" to configure the gearbox build, Edit any configuration you need and then press "c" again to save the changes. Finally press "g" to generate the build files and exit 'ccamke'.
+
+Finally build and install gearbox using 'make' and 'make install'. You can also run 'make test' to make sure everything went smoothly.
+
+== Install Player ==
+The next step is to install the version of 'Player' that comes with CoroBot. Obviously the first step is to extract the player package and cd into it's directory. Like 'gearbox', 'Player' uses 'cmake' to configure it's build process. Just like 'gearbox' were gonna use a separate directory to hold the build files, that way we can just delete it and start over if anything goes wrong, but player already comes with an empty build directory so there is no need t create one:
+{{{
+tantalum@3antar:build$ cd ../..
+tantalum@3antar:Player$ tar xfz player3.0.1cw.tar.gz 
+tantalum@3antar:Player$ cd player3.0.1/
+tantalum@3antar:player3.0.1$ cd build/
+tantalum@3antar:build$ ccmake ../
+}}}
+
+Again press "c" once to generate the default configuration, the press "c" once again to write the configuration and any changes made to it. Finally press "g" to generate the build files and exit 'cmake'
+
+One the build files are generated run 'make' and..... You get A BIG FAT ERROR THAT THROWS ALL YOUR WORK TO FREKIN WASTE! AHHHHHHHHHHHHHHHHHHHHHHHHHHH!
+
+
