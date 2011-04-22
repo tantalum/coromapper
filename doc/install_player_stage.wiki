@@ -1,28 +1,184 @@
+= Install prereuiqists: =
+TODO: Find a machine that is a fresh state and remember to list the reuirtrd libs:
+
+== Optional Libs ==
+* libboost-signals-dev
+* libboost-thread-dev
+
 = Build Player =
 == Check player from svn: ==
+{{{
 	svn co http://playerstage.svn.sourceforge.net/svnroot/playerstage/code/player/trunk/ player-svn
+}}}
 
 === Make a Build Space ===
+{{{
 	cd player-svn
 	mkdir build/
 	cd build/
+}}}
 
-=== Configure CMake ===
+=== Configure with CMake ===
 Inside of the 'build' directory:
+{{{
 	ccmake ../
+}}}
 Press 'c' to generate the default configuration and then 'g' to generate the build files
 
 === Build the Project ===
-Still within the build directory run 'make' and then if everything goes well 'make install'.
+Still within the build directory run 'make' and then if everything goes well 'make install'. You might have to add '<prefix>/lib/pkgconfig' to PKG_CONFIG_PATH. '<prefix>' is wherever player was installed to, by default the prefix is '/usr/local/'
 
+For example add the following line to the bottom of your .bashrc file:
+{{{
+export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig"
 = Build Stage =
 == Clone Stage ==
 	git clone git://github.com/rtv/Stage.git Stage-repo
 
 == Build and Configure Stage ==
+{{{
 	cd Stage-repo
 	mkdir build
 	cd build
 	ccmake ../
-As above press 'c' to configure the build and 'g' to generate the build files. Finally run
+}}}
+As above press 'c' to configure the build and 'g' to generate the build files. If you get a message about WebSim not being installed you can just ignore it by pressing 'e'. Finally run 'make' and 'make install'.
 
+= Install the Corobot software: =
+== Getting the software packages ==
+To start grab the Corobot software package from:
+{{{http://support.coroware.com/downloads/CoroBotLinuxPlayer-4.1.0.zip}}}
+
+Extract the package to a safe location:
+{{{
+tantalum@3antar:player-corobot$ unzip ~/Downloads/CoroBotLinuxPlayer-4.1.0.zip 
+Archive:  /home/tantalum/Downloads/CoroBotLinuxPlayer-4.1.0.zip
+  inflating: CoroBot Player CD 4.1/CoroWare CoroBot EULA.rtf  
+  inflating: CoroBot Player CD 4.1/Linux User and Reference Guide.pdf  
+   creating: CoroBot Player CD 4.1/Player/
+   creating: CoroBot Player CD 4.1/Player/CoroBotPlugin/
+  inflating: CoroBot Player CD 4.1/Player/CoroBotPlugin/corobot.cfg  
+  inflating: CoroBot Player CD 4.1/Player/CoroBotPlugin/corobot_comms.cc  
+  inflating: CoroBot Player CD 4.1/Player/CoroBotPlugin/corobot_comms.h  
+  inflating: CoroBot Player CD 4.1/Player/CoroBotPlugin/corobot_driver.cc  
+  inflating: CoroBot Player CD 4.1/Player/CoroBotPlugin/corobot_ptz.cc  
+  inflating: CoroBot Player CD 4.1/Player/CoroBotPlugin/corobot_ptz.h  
+  inflating: CoroBot Player CD 4.1/Player/CoroBotPlugin/corobotLaser.cfg  
+  inflating: CoroBot Player CD 4.1/Player/CoroBotPlugin/Makefile  
+  inflating: CoroBot Player CD 4.1/Player/gearbox-9.11.tar.gz  
+   creating: CoroBot Player CD 4.1/Player/GUI/
+  inflating: CoroBot Player CD 4.1/Player/GUI/arm.cc  
+  inflating: CoroBot Player CD 4.1/Player/GUI/battery.cc  
+  inflating: CoroBot Player CD 4.1/Player/GUI/camera.cc  
+  inflating: CoroBot Player CD 4.1/Player/GUI/connect.cc  
+  inflating: CoroBot Player CD 4.1/Player/GUI/drive.cc  
+  inflating: CoroBot Player CD 4.1/Player/GUI/general.cc  
+  inflating: CoroBot Player CD 4.1/Player/GUI/gps.cc  
+  inflating: CoroBot Player CD 4.1/Player/GUI/joystick.cc  
+  inflating: CoroBot Player CD 4.1/Player/GUI/logo300.jpg  
+  inflating: CoroBot Player CD 4.1/Player/GUI/Makefile  
+  inflating: CoroBot Player CD 4.1/Player/GUI/ocu.cc  
+  inflating: CoroBot Player CD 4.1/Player/GUI/ocu.glade  
+  inflating: CoroBot Player CD 4.1/Player/GUI/ocu.h  
+  inflating: CoroBot Player CD 4.1/Player/GUI/player.cc  
+  inflating: CoroBot Player CD 4.1/Player/GUI/template.xml  
+  inflating: CoroBot Player CD 4.1/Player/Phidgetlinux_2.1.6.20090806.tar.gz  
+  inflating: CoroBot Player CD 4.1/Player/player3.0.1cw.tar.gz  
+  inflating: CoroBot Player CD 4.1/Player/README  
+  inflating: CoroBot Player CD 4.1/Stop final -2.pdf  
+}}}
+
+At this point it is probably good to open the 'Linux User and Reference Guide.pdf' and skim over section "8.5 BUILDING SOFTWARE". This is a derivative of whats included in that section.
+
+== Installing Phidgets ==
+Back from where ever you extracted the CoroBot software to, cd into the Player directory, extract the Phidgets software package, and cd into the Phidgets directory:
+{{{
+tantalum@3antar:player-corobot$ cd CoroBot\ Player\ CD\ 4.1/Player/
+tantalum@3antar:Player$ ls
+CoroBotPlugin        GUI                                 player3.0.1cw.tar.gz
+gearbox-9.11.tar.gz  Phidgetlinux_2.1.6.20090806.tar.gz  README
+tantalum@3antar:Player$ tar xfz Phidgetlinux_2.1.6.20090806.tar.gz 
+tantalum@3antar:Player$ cd Phidgetlinux/phidget21/
+}}}
+
+Next build the software with make. It's possible to run just make and Phidgets will be installed in '/usr' or you can override the 'PREFIX' variable to install Phidgets in a different location. For example:
+{{{
+tantalum@3antar:phidget21$ make PREFIX=$HOME
+... SNIP ...
+tantalum@3antar:phidget21$ sudo make PREFIX=$HOME install
+... SNIP ...
+}}}
+
+Note that you have to use 'sudo' when you install phidgets so it can run 'ldconfig' correctly. Since there we only simulating the robot we can skip installing the UDev rules for the moment. 
+
+== Build the Corobot Plugin ==
+Again from the spot where you extracted the CoroBot software, change into the CoroBot plugin directory 'CoroBot Player CD 4.1/Player/CoroBotPlugin/'. Next run 'make' to build the plugin.
+
+{{{
+tantalum@3antar:CoroBotPlugin$ make
+g++ -Wall -fpic -g3 `pkg-config --cflags playercore` -c -lphidget21 -L/home/tantalum/lib -I/home/tantalum/include corobot_driver.cc
+g++ -Wall -fpic -g3 `pkg-config --cflags playercore` -c -lphidget21 -L/home/tantalum/lib -I/home/tantalum/include corobot_comms.cc
+g++ -Wall -fpic -g3 `pkg-config --cflags playercore` -c -lphidget21 -L/home/tantalum/lib -I/home/tantalum/include corobot_ptz.cc
+g++ -shared -nostartfiles -o  libcorobotdriver.so corobot_driver.o corobot_comms.o corobot_ptz.o
+}}}
+
+The make file is very simple and there is no install target. You might have to edit the 'Makefile' and tell it where Phidgets is installed before the CoroBot plugin will compile. For example I have everthing installed in my $HOME, which made the build fail. To fix this I edited the make file to look like:
+
+{{{
+PREFIX=/home/tantalum
+CXXFLAGS=-lphidget21 -L$(PREFIX)/lib -I$(PREFIX)/include
+all: libcorobotdriver.so
+
+%.o: %.cc
+	$(CXX) -Wall -fpic -g3 `pkg-config --cflags playercore` -c $(CXXFLAGS) $<
+
+libcorobotdriver.so: corobot_driver.o corobot_comms.o corobot_ptz.o
+	$(CXX) -shared -nostartfiles -o $(CXXFlAGS) $@ $^
+
+clean:
+	rm -f *.o *.so
+}}}
+
+The way you install the plugin is to simply copy it to the sample place that player installed it's library files to, that is usually '/usr/local/lib/'. In my case it was $HOME, so I ran:
+{{{
+tantalum@3antar:CoroBotPlugin$ cp libcorobotdriver.so ~/lib64/
+}}}
+
+To test that the plugin was properly set up, crate a little '.cfg' with the following contents.
+{{{
+driver
+(
+        name "camerauvc"
+        provides ["camera:0"]
+        port "/dev/video0"
+        size [640 480]
+)
+}}}
+
+Save the file then run player using the that cfg file.
+{{{
+tantalum@3antar:player_stage$ player corobit_simple.cfg
+Registering driver
+Player v.3.1.0-svn
+
+* Part of the Player/Stage/Gazebo Project [http://playerstage.sourceforge.net].
+* Copyright (C) 2000 - 2009 Brian Gerkey, Richard Vaughan, Andrew Howard,
+* Nate Koenig, and contributors. Released under the GNU General Public License.
+* Player comes with ABSOLUTELY NO WARRANTY.  This is free software, and you
+* are welcome to redistribute it under certain conditions; see COPYING
+* for details.
+
+listening on 6665
+Listening on ports: 6665
+accepted TCP client 0 on port 6665, fd 8
+CameraUvc: Driver initialising
+Unable to set format. (-1, 22)
+warning : skipping subscription to unknown device blobfinder:0
+CameraUvc: Driver initialisation done
+closing TCP connection to client 0 on port 6665
+CameraUvc: Driver shutting down
+CameraUvc: Driver shutdown complete
+^CQuitting.
+}}}
+
+While player is running open a new command window and run 'playercam'. You might see some errors from 'playercam' but don't worry about that for now. As long as player doesn't complain about not finding the corobot plugin or prasing the condif file everything should be good.
