@@ -1,5 +1,9 @@
 = Install prereuiqists: =
-TODO: Find a machine that is a fresh state and remember to list the reuirtrd libs:
+TODO: Find a machine that is a fresh state and remember to list the required libs:
+
+* cmake
+* cmake-curses-gui
+* libfltk1.3-dev
 
 == Optional Libs ==
 * libboost-signals-dev
@@ -7,35 +11,60 @@ TODO: Find a machine that is a fresh state and remember to list the reuirtrd lib
 
 = Build Player =
 == Check player from svn: ==
+The first thing to do when setting up player to checkout a copy of the source code from svn:
 {{{
 	svn co http://playerstage.svn.sourceforge.net/svnroot/playerstage/code/player/trunk/ player-svn
 }}}
 
-=== Make a Build Space ===
+=== Make a Build Space and Configure the Build System ===
+After the code has been checked out cd into the player directory and make a new directory to use a build space:
 {{{
 	cd player-svn
 	mkdir build/
 	cd build/
 }}}
 
-=== Configure with CMake ===
-Inside of the 'build' directory:
+Player uses CMake to configure the build. CMake, like autoconfig, generates makefiles that are suitable to your system and configuration. Inside of the 'build' directory:
 {{{
 	ccmake ../
 }}}
-Press 'c' to generate the default configuration and then 'g' to generate the build files
+
+CCMake prvides the user with a curses-based gui that shows the configuration options and allows users to easily edit them. Press 'c' to generate the default configuration. You might want to edit some of the default configuration variabeles, such as BUILD_DOCUMENTATION and CMAKE_INSTALL_PREFIX, if you do press 'c' again to regenerate the configuration. Finally, press 'g' to generate the build files and exit.
 
 === Build the Project ===
-Still within the build directory run 'make' and then if everything goes well 'make install'. You might have to add '<prefix>/lib/pkgconfig' to PKG_CONFIG_PATH. '<prefix>' is wherever player was installed to, by default the prefix is '/usr/local/'
+Within the build directory, after configuring the build, run 'make' and then if everything goes well 'make install'. You might have to add '<prefix>/lib/pkgconfig' to PKG_CONFIG_PATH. '<prefix>' is wherever player was installed to, by default the prefix is '/usr/local/'
 
-For example add the following line to the bottom of your .bashrc file:
+== Configure pkg-config ==
+pkg-config is a widely used tool on Linux that allows build systems to easily set the gcc options, such as include files and libraries, used by a framework. However, pkg-config has to know where the information for the libraries is stored using the PKG_CONFIG_PATH environment variable. For example, if you use you home for CMAKE_INSTALL_PREFIX add the following line to the bottom of your .bashrc file:
 {{{
-export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig"
+export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$HOME/lib/pkgconfig"
+}}}
+
+=== Configure Library Location ===
+TODO: review this
+Depending on where you install Player (e.g. if you install it to your $HOME) you might have to configure 'ld' so it knows where to find Player's shared libraries. To test this out run 'player' and if you get this error message
+{{{
+player: error while loading shared libraries: libplayerdrivers.so.3.1: cannot open shared object file: No such file or directory
+}}}
+Than you will have to add the directory that contains the player libraries (e.g. $HOME/lib) to your LD_LIBRARY_PATH.
+
 = Build Stage =
+== Requriements ==
+According to the [http://rtv.github.com/Stage/install.html Stage manual] you will the following installed before you install Stage:
+ *  pkg-config
+ *  FLTK 1.1.x
+ *  OpenGL
+ *  libpng
+ *  ltdl (Libtool)
+
 == Clone Stage ==
+First of all clone the Stage source code from the git repository:
+{{{
 	git clone git://github.com/rtv/Stage.git Stage-repo
+}}}
 
 == Build and Configure Stage ==
+Just like Player, Stage uses 'cmake' to generate make files that you can use to compile the code.
 {{{
 	cd Stage-repo
 	mkdir build
@@ -43,6 +72,13 @@ export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig"
 	ccmake ../
 }}}
 As above press 'c' to configure the build and 'g' to generate the build files. If you get a message about WebSim not being installed you can just ignore it by pressing 'e'. Finally run 'make' and 'make install'.
+
+You might get an error about library paths being set to not found. That will happen if you install player to a non-standard location (e.g. $HOME). In that case you need to set CMAKE_INCLUDE_PATH and CMAKE_LIBRARY_PATH to the appropriate locations.
+{{{
+	export CMAKE_INCLUDE_PATH=$HOME/include
+	export CMAKE_LIBRARY_PATH=$HOME/lib
+	ccmake ../
+}}}
 
 = Install the Corobot software: =
 == Getting the software packages ==
@@ -109,7 +145,7 @@ tantalum@3antar:phidget21$ sudo make PREFIX=$HOME install
 ... SNIP ...
 }}}
 
-Note that you have to use 'sudo' when you install phidgets so it can run 'ldconfig' correctly. Since there we only simulating the robot we can skip installing the UDev rules for the moment. 
+Note that you have to use 'sudo' when you install phidgets so it can run 'ldconfig' correctly. Since there we only simulating the robot we can skip installing UDev rules for the moment. 
 
 == Build the Corobot Plugin ==
 Again from the spot where you extracted the CoroBot software, change into the CoroBot plugin directory 'CoroBot Player CD 4.1/Player/CoroBotPlugin/'. Next run 'make' to build the plugin.
