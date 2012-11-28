@@ -5,7 +5,7 @@
 int main(int argc, char *argv[]){
 	playerc_client_t *client;
 	playerc_position2d_t *position2d;
-	playerc_sonar_t *sonar;
+	playerc_ranger_t *ranger;
 	int i, j;
 
 	/* Connect to robot and initilize devices */
@@ -21,9 +21,9 @@ int main(int argc, char *argv[]){
 		return -1;
 	}
 
-	sonar = playerc_sonar_create(client, 0);
-	if(playerc_sonar_subscribe(sonar, PLAYER_OPEN_MODE)){
-		fprintf(stderr, "Failed to find sonar device\n");
+	ranger = playerc_ranger_create(client, 0);
+	if(playerc_ranger_subscribe(ranger, PLAYER_OPEN_MODE)){
+		fprintf(stderr, "Failed to find ranger device\n");
 		return -1;
 	}
 
@@ -32,17 +32,17 @@ int main(int argc, char *argv[]){
 		playerc_client_read(client);
 		playerc_position2d_get_geom(position2d);
 		printf("Position: %f %f %f\n", position2d->px, position2d->py, position2d->pa);
-		printf("%d Scanned points\n", sonar->scan_count);
-		for(j=0; j<sonar->scan_count; j++){
-			printf("  %f", sonar->scan[j]);
+		printf("%d Scanned points\n", ranger->ranges_count);
+		for(j=0; j<ranger->ranges_count; j++){
+			printf("  %f", ranger->ranges[j]);
 		}
 		printf("\n\n");
 		playerc_position2d_set_cmd_vel(position2d, 1, 0, 0, 0);
 	}
 
 	/* Shut down connected devices */
-	playerc_sonar_unsubscribe(sonar);
-	playerc_sonar_destroy(sonar);
+	playerc_ranger_unsubscribe(ranger);
+	playerc_ranger_destroy(ranger);
 
 	playerc_position2d_unsubscribe(position2d);
 	playerc_position2d_destroy(position2d);

@@ -4,6 +4,7 @@ TODO: Find a machine that is a fresh state and remember to list the required lib
 * cmake
 * cmake-curses-gui
 * libfltk1.3-dev
+* libltdl-dev
 
 == Optional Libs ==
 * libboost-signals-dev
