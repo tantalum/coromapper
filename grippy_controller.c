@@ -37,7 +37,7 @@ int main(int argc, char *argv[]){
 			printf("  %f", ranger->ranges[j]);
 		}
 		printf("\n\n");
-		playerc_position2d_set_cmd_vel(position2d, 1, 0, 0, 0);
+		playerc_position2d_set_cmd_vel(position2d, 1, 0, 1, 0);
 	}
 
 	/* Shut down connected devices */
